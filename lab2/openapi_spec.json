@@ -1,0 +1,219 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Budgeting and User Management API",
+      "version": "1.0.0",
+      "description": "API для управления бюджетом и пользователями с аутентификацией"
+    },
+    "paths": {
+      "/income/": {
+        "post": {
+          "summary": "Добавить доход",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Income"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Доход добавлен",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "get": {
+          "summary": "Получить список доходов",
+          "responses": {
+            "200": {
+              "description": "Список доходов",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Income"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/expense/": {
+        "post": {
+          "summary": "Добавить расход",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Expense"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Расход добавлен",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "get": {
+          "summary": "Получить список расходов",
+          "responses": {
+            "200": {
+              "description": "Список расходов",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Expense"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/users/": {
+        "post": {
+          "summary": "Создать пользователя",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Пользователь создан",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "get": {
+          "summary": "Получить список пользователей",
+          "responses": {
+            "200": {
+              "description": "Список пользователей",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/token": {
+        "post": {
+          "summary": "Аутентификация пользователя",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/x-www-form-urlencoded": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": { "type": "string" },
+                    "password": { "type": "string" }
+                  },
+                  "required": ["username", "password"]
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Успешная аутентификация",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": { "type": "string" },
+                      "user": {
+                        "$ref": "#/components/schemas/User"
+                      },
+                      "access_token": { "type": "string" },
+                      "token_type": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Income": {
+          "type": "object",
+          "properties": {
+            "amount": { "type": "number" },
+            "source": { "type": "string" }
+          }
+        },
+        "Expense": {
+          "type": "object",
+          "properties": {
+            "amount": { "type": "number" },
+            "category": { "type": "string" }
+          }
+        },
+        "User": {
+          "type": "object",
+          "properties": {
+            "role": { "type": "string" },
+            "username": { "type": "string" },
+            "login": { "type": "string" },
+            "password": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+  
