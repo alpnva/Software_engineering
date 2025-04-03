@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, APIRouter
-from budgeting_model import Income, Expense, Budget
+from .budgeting_model import Income, Expense, Budget
 from typing import List
 
 router = APIRouter()
