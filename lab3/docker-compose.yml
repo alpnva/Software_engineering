@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:15
+    container_name: budgeting_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: budgeting
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/pg_trgm.sql:/docker-entrypoint-initdb.d/pg_trgm.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - services-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d budgeting"]
+      interval: 5s 
+      timeout: 5s
+      retries: 5
+    
+  user_service:
+    build:
+      context: .
+      dockerfile: users/Dockerfile
+    container_name: users_app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/budgeting
+    networks:
+      - services-network
+
+
+  budget_service:
+    build:
+      context: .
+      dockerfile: budgeting/Dockerfile
+    container_name: budgeting_app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8001:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/budgeting
+    networks:
+      - services-network
+
+networks:
+  services-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
