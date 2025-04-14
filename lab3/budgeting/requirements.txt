@@ -1,0 +1,13 @@
+fastapi
+pydantic
+uvicorn
+python-multipart
+PyJWT
+python-jose
+datetime
+typing
+passlib
+psycopg2
+sqlalchemy
+
+
