@@ -18,7 +18,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres -d budgeting"]
       interval: 5s 
       timeout: 5s
-      retries: 5
+      retries: 10
       
   mongo:
     image: mongo:7.0
@@ -63,8 +63,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mongo:
+        condition: service_healthy
     ports:
-      - "8001:8000"
+      - "8001:8001"
     environment:
       DATABASE_URL: postgresql://postgres:postgres@db:5432/budgeting
       MONGO_URL: mongodb://mongo:27017/budgeting
