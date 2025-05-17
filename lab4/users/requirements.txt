@@ -1,0 +1,14 @@
+fastapi
+pydantic
+uvicorn
+python-multipart
+PyJWT
+python-jose
+datetime
+typing
+passlib
+psycopg2
+sqlalchemy
+datetime
+pymongo==4.3.3
+bson
