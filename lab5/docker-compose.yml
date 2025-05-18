@@ -1,0 +1,100 @@
+services:
+  db:
+    image: postgres:15
+    container_name: budgeting_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: budgeting
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # - ./db/pg_trgm.sql:/docker-entrypoint-initdb.d/pg_trgm.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - services-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d budgeting"]
+      interval: 5s 
+      timeout: 5s
+      retries: 10
+      
+  mongo:
+    image: mongo:7
+    command: --wiredTigerCacheSizeGB 0.25
+    container_name: budgeting_mongo
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: budgeting
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - services-network
+    healthcheck:
+      test: ["CMD-SHELL", "mongosh --quiet --eval 'try { db.adminCommand({ping:1}); quit(0) } catch(e) { quit(1) }'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  redis:
+    image: redis:5.0.0
+    container_name: budgeting_cache
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - services-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    
+  user_service:
+    build:
+      context: .
+      dockerfile: users/Dockerfile
+    container_name: users_app
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/budgeting
+      REDIS_URL: redis://redis:6379/0
+    networks:
+      - services-network
+
+
+  budget_service:
+    build:
+      context: .
+      dockerfile: budgeting/Dockerfile
+    container_name: budgeting_app
+    depends_on:
+      db:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/budgeting
+      MONGO_URL: mongodb://mongo:27017/budgeting
+    networks:
+      - services-network
+
+networks:
+  services-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongo_data:
